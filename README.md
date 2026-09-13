@@ -91,11 +91,13 @@ On **Render**, set these in **Environment → Environment Variables** in the das
 1. Push your code to GitHub.
 2. In the Render dashboard → **New → Web Service** → connect your repo.
 3. Set the following:
-   - **Environment**: `Java`
-   - **Build Command**: `./mvnw clean package -DskipTests`
-   - **Start Command**: `java -jar target/urlshortner-0.0.1-SNAPSHOT.jar`
+   - **Environment**: `Docker`
+   - Render will automatically detect the `Dockerfile` and build the image.
 4. Add all environment variables listed in the table above under **Environment → Environment Variables**.
-5. Deploy — Render will build and start the service automatically.
+5. Deploy — Render builds the Docker image and starts the container automatically.
+
+> **Note:** Render injects the `PORT` environment variable automatically. The app reads it via `server.port=${PORT:8080}`, so no manual port config is needed.
+
 
 ---
 

@@ -1,0 +1,26 @@
+# Build output — the Docker build stage compiles its own JAR
+target/
+
+# Git internals
+.git/
+.gitignore
+.gitattributes
+
+# IDE / editor files
+.idea/
+*.iws
+*.iml
+*.ipr
+.vscode/
+*.classpath
+*.project
+*.settings/
+
+# Environment / secrets — never send to Docker daemon
+.env
+.env.*
+application-local.properties
+
+# OS noise
+.DS_Store
+Thumbs.db
