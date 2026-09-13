@@ -20,6 +20,7 @@ A Spring Boot REST API that shortens URLs, stores them in **PostgreSQL (Neon)**,
 
 | Method | Path                  | Description                              |
 |--------|-----------------------|------------------------------------------|
+| GET    | `/healthz`            | Health check — DB + Redis status (200/503) |
 | POST   | `/api/v1/shorturl`    | Shorten a URL                            |
 | GET    | `/{hash}`             | Redirect to the original URL (302 Found) |
 
@@ -97,6 +98,8 @@ On **Render**, set these in **Environment → Environment Variables** in the das
 5. Deploy — Render builds the Docker image and starts the container automatically.
 
 > **Note:** Render injects the `PORT` environment variable automatically. The app reads it via `server.port=${PORT:8080}`, so no manual port config is needed.
+>
+> Set the **Health Check Path** to `/healthz` in the Render service settings so Render can verify the app (and its DB + Redis connections) are fully up before routing traffic.
 
 
 ---
