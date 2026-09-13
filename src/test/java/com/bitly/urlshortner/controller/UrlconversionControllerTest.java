@@ -7,6 +7,7 @@ import com.bitly.urlshortner.dao.postgres.UrlsRepository;
 import com.bitly.urlshortner.exception.GlobalExceptionHandler;
 import com.bitly.urlshortner.exception.UrlNotFoundException;
 import com.bitly.urlshortner.service.UrlConversion.UrlConversionService;
+import com.bitly.urlshortner.utils.RedisService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +45,9 @@ class UrlconversionControllerTest {
 
     @MockitoBean
     private UrlsRepository urlsRepository;
+
+    @MockitoBean
+    private RedisService redisService;
 
     // ==========================================================
     // POST /api/v1/shorturl – Happy path
@@ -216,6 +220,7 @@ class UrlconversionControllerTest {
         url.setCreatedAt(System.currentTimeMillis());
         url.setUpdatedAt(url.getCreatedAt());
 
+        when(redisService.get("abc1234")).thenReturn(null); // cache miss → go to DB
         when(urlsRepository.findById("abc1234")).thenReturn(Optional.of(url));
 
         mockMvc.perform(get("/abc1234"))
@@ -229,17 +234,19 @@ class UrlconversionControllerTest {
 
     @Test
     void redirect_withUnknownHash_shouldReturn404WithJsonError() throws Exception {
+        when(redisService.get("unknown7")).thenReturn(null); // cache miss → go to DB
         when(urlsRepository.findById("unknown7")).thenReturn(Optional.empty());
 
         mockMvc.perform(get("/unknown7"))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.status").value(404))
                 .andExpect(jsonPath("$.error").value("Not Found"))
-                .andExpect(jsonPath("$.message").value(containsString("unknown7")));
+                .andExpect(jsonPath("$.message").value("Short URL not found."));
     }
 
     @Test
     void redirect_notFound_shouldContainTimestamp() throws Exception {
+        when(redisService.get("missing1")).thenReturn(null);
         when(urlsRepository.findById("missing1")).thenReturn(Optional.empty());
 
         mockMvc.perform(get("/missing1"))
@@ -260,6 +267,7 @@ class UrlconversionControllerTest {
         url.setCreatedAt(System.currentTimeMillis());
         url.setUpdatedAt(url.getCreatedAt());
 
+        when(redisService.get("bad1234")).thenReturn(null);
         when(urlsRepository.findById("bad1234")).thenReturn(Optional.of(url));
 
         mockMvc.perform(get("/bad1234"))

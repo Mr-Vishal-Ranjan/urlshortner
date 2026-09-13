@@ -19,7 +19,7 @@ RUN mvn dependency:go-offline -q
 # Copy source and build the fat JAR, skipping tests
 # (tests should run in CI, not inside the Docker build)
 COPY src/ src/
-RUN mvn clean package -DskipTests -q
+RUN mvn clean package -Dmaven.test.skip=true -q
 
 
 # ─────────────────────────────────────────────────────────────────────────────
